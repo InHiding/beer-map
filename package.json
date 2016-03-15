@@ -1,0 +1,24 @@
+{
+  "name": "beer-map",
+  "version": "0.0.1",
+  "description": "Find the cheapest beers around you.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InHiding/beer-map.git"
+  },
+  "keywords": [
+    "beer",
+    "map",
+    "bar"
+  ],
+  "author": "Giuliano Melo",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/InHiding/beer-map/issues"
+  },
+  "homepage": "https://github.com/InHiding/beer-map#readme"
+}
