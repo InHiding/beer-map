@@ -26,5 +26,8 @@
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-connect": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0"
+  },
+  "dependencies": {
+    "angular": "^1.5.0"
   }
 }
