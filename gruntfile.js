@@ -4,8 +4,17 @@ module.exports = function(grunt) {
     jshint: {
       files: ['gruntfile.js', 'app/**/*.js', 'test/**/*.js']
     },
+    copy: {
+      css: {
+        src: 'node_modules/normalize.css/*.css',
+        dest: 'assets/css/',
+        expand: true,
+        flatten: true,
+        filter: 'isFile'
+      }
+    },
     browserify: {
-      'dist/bundle.js': ['app/app.js']
+      'dist/app.js': ['app/**/*.js']
     },
     watch: {
       files: ['<%= jshint.files %>'],
@@ -18,9 +27,11 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-browserify');
-  
-  grunt.registerTask('default', ['connect', 'watch']);
+
+  grunt.registerTask('default', ['copy', 'browserify', 'connect', 'watch']);
 };
