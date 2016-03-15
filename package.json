@@ -20,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/InHiding/beer-map/issues"
   },
-  "homepage": "https://github.com/InHiding/beer-map#readme"
+  "homepage": "https://github.com/InHiding/beer-map#readme",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-connect": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0"
+  }
 }
