@@ -20,6 +20,21 @@ function MapController($scope) {
     $scope.map.addListener('click', setMapCenter);
   };
 
+  var markerInfo = function(info, marker) {
+    var content = 
+      '<h2>' + info.name + '</h2>' +
+      '<div class="infoWindowContent">' +
+      '<img src="' + info.icon + '"/>' +
+      '<p>' + info.vicinity + '</p>' +
+      '<p><strong>Rating: ' + info.rating + '</strong></p>' +
+      '</div>';
+
+      google.maps.event.addListener(marker, 'click', function(){
+        vm.infoWindow.setContent(content);
+        vm.infoWindow.open($scope.map, marker);
+      }); 
+  };
+
   var createMarker = function (info){
     var marker = new google.maps.Marker({
       map: $scope.map,
@@ -27,18 +42,8 @@ function MapController($scope) {
       title: info.name
     });
 
-    marker.content = '<div class="infoWindowContent">' +
-      '<img src="' + info.icon + '"/>' + 
-        '<h3>' + info.vicinity + '</h3>' +
-          '<h5>Rating:' + info.rating + '</h5>' +
-            '</div>';
-
-            google.maps.event.addListener(marker, 'click', function(){
-              vm.infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
-              vm.infoWindow.open($scope.map, marker);
-            });
-
-            vm.markers.push(marker);
+    markerInfo(info, marker);
+    vm.markers.push(marker);
   }; 
 
   var createMarkers = function(list) {
@@ -107,7 +112,6 @@ function MapController($scope) {
 
   var setMapCenter = function(position) {
     $scope.map.setCenter(position.latLng);
-    console.log('New center: ' + position.latLng.lat() + ':' + position.latLng.lng());
   };
 
   initMap();
