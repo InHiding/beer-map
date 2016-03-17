@@ -31,5 +31,10 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+# proejct stuff
 /dist/*
 /assets/css/normalize.css
+
+# temporary files
+*.swp
