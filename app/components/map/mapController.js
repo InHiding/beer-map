@@ -1,26 +1,27 @@
-angular.module('BeerMap').controller('MapCtrl', MapController);
+(function(){
+  angular.module('BeerMap').controller('MapCtrl', MapController);
 
-function MapController($scope) {
-  var vm = this;
+  function MapController($scope) {
+    var vm = this;
 
-  vm.markers = [];
-  vm.openNow = false;
+    vm.markers = [];
+    vm.openNow = false;
 
-  var initMap = function() {
-    var mapOptions = { 
-      zoom: 15,
-      center: new google.maps.LatLng(-23.55000, -46.633333)
+    var initMap = function() {
+      var mapOptions = { 
+        zoom: 15,
+        center: new google.maps.LatLng(-23.55000, -46.633333)
+      };
+
+      $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+      vm.placesSrv = new google.maps.places.PlacesService($scope.map);
+      vm.infoWindow = new google.maps.InfoWindow();
+
+      $scope.map.addListener('center_changed', searchPlaces);
+      $scope.map.addListener('click', setMapCenter);
     };
 
-    $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-    vm.placesSrv = new google.maps.places.PlacesService($scope.map);
-    vm.infoWindow = new google.maps.InfoWindow();
-    
-    $scope.map.addListener('center_changed', searchPlaces);
-    $scope.map.addListener('click', setMapCenter);
-  };
-
-  var markerInfo = function(place, marker) {
+    var markerInfo = function(place, marker) {
       google.maps.event.addListener(marker, 'click', function(){
         vm.placesSrv.getDetails(place, function(result, status) {
           if (status !== google.maps.places.PlacesServiceStatus.OK) {
@@ -36,91 +37,92 @@ function MapController($scope) {
             '<p><strong>Rating: ' + result.rating + '</strong></p>' +
             '</div>';
 
-          vm.infoWindow.setContent(content);
-          vm.infoWindow.open($scope.map, marker);
+            vm.infoWindow.setContent(content);
+            vm.infoWindow.open($scope.map, marker);
         });
       }); 
-  };
-
-  var createMarker = function (place){
-    var marker = new google.maps.Marker({
-      map: $scope.map,
-      position: place.geometry.location,
-      title: place.name
-    });
-
-    markerInfo(place, marker);
-    vm.markers.push(marker);
-  }; 
-
-  var createMarkers = function(list) {
-    if(!list) {
-      return;
-    }
-
-    for (var i = 0; i < list.length; i++) {
-      createMarker(list[i]);
-    }
-  };
-
-  var clearMarkers = function() {
-    vm.markers.forEach(function(marker){
-      marker.setMap(null);
-    });
-    vm.markers.length = 0;
-  };
-
-  var searchPlaces = function() {
-    var request = {
-      location: $scope.map.getCenter(),
-      radius: '2000',
-      openNow: vm.openNow,
-      types: ['bar']
     };
 
-    clearMarkers();
-
-    vm.placesSrv.nearbySearch(
-      request, 
-      function(results, status, pagination){
-        if (status == google.maps.places.PlacesServiceStatus.OK) {
-          createMarkers(results);
-
-          while(pagination.hasNextPage) {
-            results = pagination.nextPage();
-            if(!results) { // protect against infinite loop if gmaps api let us down :P
-              break;
-            }
-            createMarkers(results);
-          }
-        }
+    var createMarker = function (place){
+      var marker = new google.maps.Marker({
+        map: $scope.map,
+        position: place.geometry.location,
+        title: place.name
       });
-  };
 
-  var getGeolocation = function() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function(position) {
-          var pos = {
-            latLng: new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
-          };
+      markerInfo(place, marker);
+      vm.markers.push(marker);
+    }; 
 
-          setMapCenter(pos);
-        }, function() {
-          handleLocationError(true, infoWindow, map.getCenter());
+    var createMarkers = function(list) {
+      if(!list) {
+        return;
+      }
+
+      for (var i = 0; i < list.length; i++) {
+        createMarker(list[i]);
+      }
+    };
+
+    var clearMarkers = function() {
+      vm.markers.forEach(function(marker){
+        marker.setMap(null);
+      });
+      vm.markers.length = 0;
+    };
+
+    var searchPlaces = function() {
+      var request = {
+        location: $scope.map.getCenter(),
+        radius: '2000',
+        openNow: vm.openNow,
+        types: ['bar']
+      };
+
+      clearMarkers();
+
+      vm.placesSrv.nearbySearch(
+        request, 
+        function(results, status, pagination){
+          if (status == google.maps.places.PlacesServiceStatus.OK) {
+            createMarkers(results);
+
+            while(pagination.hasNextPage) {
+              results = pagination.nextPage();
+              if(!results) { // protect against infinite loop if gmaps api let us down :P
+                break;
+              }
+              createMarkers(results);
+            }
+          }
         });
-    } else {
-      // Browser doesn't support Geolocation
-      error = browserHasGeolocation ? 'Error: The Geolocation service failed.' :
-        'Error: Your browser doesn\'t support geolocation.';
-        console.log(error);
-    }
-  };
+    };
 
-  var setMapCenter = function(position) {
-    $scope.map.setCenter(position.latLng);
-  };
+    var getGeolocation = function() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            var pos = {
+              latLng: new google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+            };
 
-  initMap();
-  getGeolocation();
-}
+            setMapCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+      } else {
+        // Browser doesn't support Geolocation
+        error = browserHasGeolocation ? 'Error: The Geolocation service failed.' :
+          'Error: Your browser doesn\'t support geolocation.';
+          console.error(error);
+      }
+    };
+
+    var setMapCenter = function(position) {
+      $scope.map.setCenter(position.latLng);
+    };
+
+    initMap();
+    getGeolocation();
+  }
+})();
