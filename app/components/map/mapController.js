@@ -1,7 +1,7 @@
 (function(){
   angular.module('BeerMap').controller('MapCtrl', MapController);
 
-  function MapController($scope) {
+  function MapController() {
     var vm = this;
 
     vm.markers = [];
@@ -13,12 +13,12 @@
         center: new google.maps.LatLng(-23.55000, -46.633333)
       };
 
-      $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-      vm.placesSrv = new google.maps.places.PlacesService($scope.map);
+      vm.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+      vm.placesSrv = new google.maps.places.PlacesService(vm.map);
       vm.infoWindow = new google.maps.InfoWindow();
 
-      $scope.map.addListener('center_changed', searchPlaces);
-      $scope.map.addListener('click', setMapCenter);
+      vm.map.addListener('center_changed', searchPlaces);
+      vm.map.addListener('click', setMapCenter);
     };
 
     var markerInfo = function(place, marker) {
@@ -38,14 +38,14 @@
             '</div>';
 
             vm.infoWindow.setContent(content);
-            vm.infoWindow.open($scope.map, marker);
+            vm.infoWindow.open(vm.map, marker);
         });
       }); 
     };
 
     var createMarker = function (place){
       var marker = new google.maps.Marker({
-        map: $scope.map,
+        map: vm.map,
         position: place.geometry.location,
         title: place.name
       });
@@ -73,7 +73,7 @@
 
     var searchPlaces = function() {
       var request = {
-        location: $scope.map.getCenter(),
+        location: vm.map.getCenter(),
         radius: '2000',
         openNow: vm.openNow,
         types: ['bar']
@@ -119,7 +119,7 @@
     };
 
     var setMapCenter = function(position) {
-      $scope.map.setCenter(position.latLng);
+      vm.map.setCenter(position.latLng);
     };
 
     initMap();
