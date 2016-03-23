@@ -20,29 +20,36 @@ function MapController($scope) {
     $scope.map.addListener('click', setMapCenter);
   };
 
-  var markerInfo = function(info, marker) {
-    var content = 
-      '<h2>' + info.name + '</h2>' +
-      '<div class="infoWindowContent">' +
-      '<img src="' + info.icon + '"/>' +
-      '<p>' + info.vicinity + '</p>' +
-      '<p><strong>Rating: ' + info.rating + '</strong></p>' +
-      '</div>';
-
+  var markerInfo = function(place, marker) {
       google.maps.event.addListener(marker, 'click', function(){
-        vm.infoWindow.setContent(content);
-        vm.infoWindow.open($scope.map, marker);
+        vm.placesSrv.getDetails(place, function(result, status) {
+          if (status !== google.maps.places.PlacesServiceStatus.OK) {
+            console.error(status);
+            return;
+          }
+
+          var content = 
+            '<h2>' + result.name + '</h2>' +
+            '<div class="infoWindowContent">' +
+            '<img src="' + result.icon + '"/>' +
+            '<p>' + result.vicinity + '</p>' +
+            '<p><strong>Rating: ' + result.rating + '</strong></p>' +
+            '</div>';
+
+          vm.infoWindow.setContent(content);
+          vm.infoWindow.open($scope.map, marker);
+        });
       }); 
   };
 
-  var createMarker = function (info){
+  var createMarker = function (place){
     var marker = new google.maps.Marker({
       map: $scope.map,
-      position: info.geometry.location,
-      title: info.name
+      position: place.geometry.location,
+      title: place.name
     });
 
-    markerInfo(info, marker);
+    markerInfo(place, marker);
     vm.markers.push(marker);
   }; 
 
